@@ -1,0 +1,86 @@
+name: Import portfolio website
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-portfolio.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download portfolio files
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://nivitha-portfolio-mockup.nivitha.chatgpt.site"
+          curl -L --fail --retry 3 "$base/" -o index.html
+          files=(
+            "assets/framework-XU8gKkFC.js"
+            "assets/index-CtVXNBql.js"
+            "assets/index-DK7Q5YP7.css"
+            "assets/layout-segment-context-BRmgGGHe.js"
+            "assets/rolldown-runtime-S-ySWqyJ.js"
+            "case-studies/habit-21.html"
+            "case-studies/movemate.html"
+            "case-studies/nestsync.html"
+            "favicon.svg"
+            "file.svg"
+            "globe.svg"
+            "media/impulse-coffee-tins.jpg"
+            "media/impulse-coffee-tins.mp4"
+            "media/impulse-poster.jpg"
+            "media/impulse-showcase.mp4"
+            "media/motion/arizona-postcards.jpg"
+            "media/motion/arizona-postcards.mp4"
+            "media/motion/calendar-2027.jpg"
+            "media/motion/calendar-2027.mp4"
+            "media/motion/city-journey.jpg"
+            "media/motion/city-journey.mp4"
+            "media/motion/fifa-26-intro.jpg"
+            "media/motion/fifa-26-intro.mp4"
+            "media/motion/life-update.jpg"
+            "media/motion/life-update.mp4"
+            "media/motion/matchbox-lighting.jpg"
+            "media/motion/matchbox-lighting.mp4"
+            "media/motion/play-card-affirmations-updated.jpg"
+            "media/motion/play-card-affirmations-updated.mp4"
+            "media/motion/play-card-affirmations.jpg"
+            "media/motion/play-card-affirmations.mp4"
+            "media/motion/scratcher-affirmations.jpg"
+            "media/motion/scratcher-affirmations.mp4"
+            "media/motion/south-indian-thali.jpg"
+            "media/motion/south-indian-thali.mp4"
+            "media/motion/tap-n-pop.jpg"
+            "media/motion/tap-n-pop.mp4"
+            "media/nivitha-maddela.jpg"
+            "media/projects/habit-21-cover.png"
+            "media/projects/movemate-cover.png"
+            "media/projects/nestsync-cover.png"
+            "window.svg"
+          )
+          for file in "${files[@]}"; do
+            mkdir -p "$(dirname "$file")"
+            curl -L --fail --retry 3 "$base/$file" -o "$file"
+          done
+          touch .nojekyll
+
+      - name: Commit imported website
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets case-studies media favicon.svg file.svg globe.svg window.svg .nojekyll
+          if git diff --cached --quiet; then
+            echo "Portfolio is already current."
+          else
+            git commit -m "Add complete Nivitha portfolio website"
+            git push
+          fi
