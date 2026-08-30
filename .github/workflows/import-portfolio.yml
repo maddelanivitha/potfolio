@@ -25,7 +25,7 @@ jobs:
           files=(
             "assets/framework-XU8gKkFC.js"
             "assets/index-CtVXNBql.js"
-            "assets/index-DK7Q5YP7.css"
+            "assets/index-DQZY2Qjf.css"
             "assets/layout-segment-context-BRmgGGHe.js"
             "assets/rolldown-runtime-S-ySWqyJ.js"
             "case-studies/habit-21.html"
@@ -70,6 +70,8 @@ jobs:
             mkdir -p "$(dirname "$file")"
             curl -L --fail --retry 3 "$base/$file" -o "$file"
           done
+          sed -i 's|="/|="./|g' index.html
+          sed -i 's|="/|="../|g' case-studies/*.html
           touch .nojekyll
 
       - name: Commit imported website
